@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  database:
+    image: mariadb:10.11
+    container_name: moodle_db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+      # Automatischer Import eurer alten Datenbank beim ersten Start:
+      - ./moodledump.sql:/docker-entrypoint-initdb.d/moodledump.sql:ro
+    networks:
+      - moodle_net
+
+  moodle:
+    image: bitnami/moodle:latest
+    container_name: moodle_web
+    restart: unless-stopped
+    ports:
+      - "80:8080"
+      - "443:8443"
+    depends_on:
+      - database
+    environment:
+      - MOODLE_DATABASE_HOST=database
+      - MOODLE_DATABASE_USER=${MYSQL_USER}
+      - MOODLE_DATABASE_PASSWORD=${MYSQL_PASSWORD}
+      - MOODLE_DATABASE_NAME=${MYSQL_DATABASE}
+    volumes:
+      - moodledata:/bitnami/moodledata
+    networks:
+      - moodle_net
+
+volumes:
+  dbdata:
+  moodledata:
+
+networks:
+  moodle_net:
+    driver: bridge

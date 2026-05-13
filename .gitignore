@@ -1,0 +1,8 @@
+# Ignoriere sensible Daten und Passwörter
+.env
+
+# Ignoriere Datenbank-Dumps (zu gross für GitHub)
+*.sql
+
+# Ignoriere Backup-Ordner
+backup/
