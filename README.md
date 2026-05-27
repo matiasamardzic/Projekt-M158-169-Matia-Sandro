@@ -1,8 +1,8 @@
-# 🚀 Moodle Migration & Parallel Deployment Guide (Side-by-Side)
+# Moodle Migration & Parallel Deployment Guide (Side-by-Side)
 
 Dieses Repository enthält das vollständig automatisierte Deployment für die Migration des Moodle-Systems der Schule auf **Moodle Version 4.1.1 LTS** mit einer **MySQL 8.4** Datenbank. 
 
-## 📋 Voraussetzungen vor dem Start
+## Voraussetzungen vor dem Start
 1. **Frische Lehrmittel-VM:** Komplett frisch.
 2. **USB-Stick (Kundendaten):** Angesteckt. Er muss aus Datenschutzgründen zwingend diese **2 Dateien** enthalten, welche über die `.gitignore` vom Repository ausgeschlossen wurden:
    * `.env` (Die Konfigurationsdatei mit den Passwörtern)
@@ -12,7 +12,7 @@ Dieses Repository enthält das vollständig automatisierte Deployment für die M
 
 ---
 
-## 🛠️ Ausführung (Copy & Paste Skript)
+## Ausführung (Copy & Paste Skript)
 
 ### SCHRITT 1: Altes System verschieben & Code holen
 Kopieren Sie diesen gesamten Block, fügen Sie ihn in ein Terminal der VM ein und drücken Sie Enter. Dies verschiebt das alte System auf Port 8080, behebt die Design-Pfade, räumt die Docker-Umgebung auf und klont den neuen Code.
@@ -35,7 +35,7 @@ cd Projekt-M158-169-Matia-Sandro
 
 ---
 
-### ⚠️ MANUELLER SCHRITT: Kundendaten einfügen ⚠️
+### MANUELLER SCHRITT: Kundendaten einfügen 
 Bevor das neue System gestartet wird, müssen die sensiblen Kundendaten bereitgestellt werden (Secret Provisioning).
 Kopieren Sie jetzt manuell die **2 Dateien** (`.env` und `moodledump.sql`) von Ihrem USB-Stick direkt in den neu erstellten Ordner `Projekt-M158-169-Matia-Sandro`.
 
@@ -55,7 +55,7 @@ sudo chmod -R 777 moodledata
 
 ---
 
-## 📊 Erreichbarkeit der Systeme
+## Erreichbarkeit der Systeme
 
 Sie können nun parallel auf beide Systeme zugreifen, um die erfolgreiche Side-by-Side-Migration zu überprüfen:
 
@@ -65,7 +65,7 @@ Sie können nun parallel auf beide Systeme zugreifen, um die erfolgreiche Side-b
 
 ---
 
-## 🛡️ Automatisiertes Backup testen
+## Automatisiertes Backup testen
 
 Um ein vollständiges Backup der laufenden Moodle-Datenbank und der Kursdatenbank zu erstellen, führen Sie dieses mitgelieferte Skript aus:
 
