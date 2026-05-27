@@ -1,16 +1,10 @@
-# Projekt-M158-169-Matia-Sandro
 # 🚀 Moodle Migration & Parallel Deployment Guide (Side-by-Side)
 
 Dieses Repository enthält das vollständig automatisierte Deployment für die Migration des Moodle-Systems der Schule auf **Moodle Version 4.1.1 LTS** mit einer **MySQL 8.4** Datenbank. 
 
-Dieses Dokument dient als exakter, schrittweiser Leitfaden für das Kundengespräch mit Herrn Lux und für den Testlauf auf der frischen Lehrmittel-VM.
-
----
-
 ## 📋 Voraussetzungen vor dem Start
-
 1. **Frische Lehrmittel-VM:** Komplett frisch.
-2. **USB-Stick (Kundendaten):** Angesteckt. Er muss zwingend folgende **2 Dateien** enthalten:
+2. **USB-Stick (Kundendaten):** Angesteckt. Er muss aus Datenschutzgründen zwingend diese **2 Dateien** enthalten, welche über die `.gitignore` vom Repository ausgeschlossen wurden:
    * `.env` (Die Konfigurationsdatei mit den Passwörtern)
    * `moodledump.sql` (Der originale Datenbank-Dump)
 
@@ -18,64 +12,65 @@ Dieses Dokument dient als exakter, schrittweiser Leitfaden für das Kundengespr�
 
 ---
 
-## 🛠️ Schritt-für-Schritt Live-Skript
+## 🛠️ Ausführung (Copy & Paste Skript)
 
-Führt die folgenden Befehle nacheinander im Linux-Terminal der VM aus.
-
-### SCHRITT 1: Altes Moodle auf Port 8080 verschieben & Design fixen
-
-Wir verschieben das alte System auf Port 8080, damit unser neues System den Haupt-Port 80 übernehmen kann. Die CSS-Pfade werden automatisch korrigiert.
+### SCHRITT 1: Altes System verschieben & Code holen
+Kopieren Sie diesen gesamten Block, fügen Sie ihn in ein Terminal der VM ein und drücken Sie Enter. Dies verschiebt das alte System auf Port 8080, behebt die Design-Pfade, räumt die Docker-Umgebung auf und klont den neuen Code.
 
 ```bash
-# 1. Apache-Ports von 80 auf 8080 umstellen
+# 1. Apache-Ports auf 8080 umstellen & neu starten
 sudo sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/ports.conf
 sudo sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:8080>/g' /etc/apache2/sites-enabled/*.conf
-
-# 2. Apache neu starten
 sudo systemctl restart apache2
 
-# 3. Internen Moodle-Pfad (Design-Fix) umkonfigurieren
-if [ -f /var/www/html/config.php ]; then
-    sudo sed -i "s|'http://localhost'|'http://localhost:8080'|g" /var/www/html/config.php
-fi
-if [ -f /var/www/html/moodle/config.php ]; then
-    sudo sed -i "s|'http://localhost'|'http://localhost:8080'|g" /var/www/html/moodle/config.php
-fi
+# 2. Internen Moodle-Pfad (Design-Fix) anpassen
+if [ -f /var/www/html/config.php ]; then sudo sed -i "s|'http://localhost'|'http://localhost:8080'|g" /var/www/html/config.php; fi
+if [ -f /var/www/html/moodle/config.php ]; then sudo sed -i "s|'http://localhost'|'http://localhost:8080'|g" /var/www/html/moodle/config.php; fi
 
-
-### SCHRITT 2: Bereinigung, Klonen & USB-Transfer
-
-Wir holen den Code von GitHub und binden die geschützten Kundendaten ein.
-
-```bash
-# 1. Alte Docker-Leichen killen
+# 3. Docker aufräumen, Repo klonen & in den Ordner wechseln
 sudo docker rm -f $(sudo docker ps -aq) 2>/dev/null || true
-
-# 2. Repository klonen
 git clone [https://github.com/matiasamardzic/Projekt-M158-169-Matia-Sandro.git](https://github.com/matiasamardzic/Projekt-M158-169-Matia-Sandro.git)
-
-# 3. In den Ordner wechseln
 cd Projekt-M158-169-Matia-Sandro
-⚠️ MANUELLER SCHRITT: Kopiere jetzt die 2 Dateien (.env und moodledump.sql) vom USB-Stick genau in diesen Ordner Projekt-M158-169-Matia-Sandro.
+```
 
-### SCHRITT 3: Das neues Moodle auf Port 80 starten
-Wir starten die automatisierte Infrastruktur (Infrastructure-as-Code).
+---
+
+### ⚠️ MANUELLER SCHRITT: Kundendaten einfügen ⚠️
+Bevor das neue System gestartet wird, müssen die sensiblen Kundendaten bereitgestellt werden (Secret Provisioning).
+Kopieren Sie jetzt manuell die **2 Dateien** (`.env` und `moodledump.sql`) von Ihrem USB-Stick direkt in den neu erstellten Ordner `Projekt-M158-169-Matia-Sandro`.
+
+---
+
+### SCHRITT 2: Neues System (Port 80) starten
+Wenn die 2 Dateien im Ordner liegen, kopieren Sie diesen Block komplett ins Terminal und drücken Sie Enter. Docker baut nun die Container und importiert die Datenbank automatisch.
 
 ```bash
-# 1. Container bauen und starten
+# 1. Neues Moodle bauen und starten
 sudo docker compose up -d --build
 
-# 2. Schreibrechte für Moodle-Daten setzen (Behebt den dataroot-Fehler)
+# 2. Schreibrechte für Moodle-Daten setzen (gegen Dataroot-Fehler)
 sudo chmod -R 777 moodledata
+```
+*(Warten Sie nach Ausführung ca. 1–2 Minuten, bis Moodle im Hintergrund das interne Datenbank-Upgrade vollzogen hat).*
 
+---
 
-### SCHRITT 4: Migration & Zielversion beweisen
+## 📊 Erreichbarkeit der Systeme
 
+Sie können nun parallel auf beide Systeme zugreifen, um die erfolgreiche Side-by-Side-Migration zu überprüfen:
 
-### SCHRITT 5: Das automatisierte Backup (Testfall 6)
+* **Neues System (Ziel-Zustand):** `http://localhost`
+  *(Login: vmadmin / Riethuesli>12345)*
+* **Altes System (Backup-Zustand):** `http://localhost:8080`
+
+---
+
+## 🛡️ Automatisiertes Backup testen
+
+Um ein vollständiges Backup der laufenden Moodle-Datenbank und der Kursdatenbank zu erstellen, führen Sie dieses mitgelieferte Skript aus:
 
 ```bash
-
-# Backup ausführen
 sudo chmod +x backup.sh
 sudo ./backup.sh
+```
+Das Backup wird anschliessend sicher mit einem Zeitstempel im Ordner `/backup` abgelegt.
