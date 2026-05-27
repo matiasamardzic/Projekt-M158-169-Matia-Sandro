@@ -29,7 +29,7 @@ if [ -f /var/www/html/moodle/config.php ]; then sudo sed -i "s|'http://localhost
 
 # 3. Docker aufräumen, Repo klonen & in den Ordner wechseln
 sudo docker rm -f $(sudo docker ps -aq) 2>/dev/null || true
-git clone [https://github.com/matiasamardzic/Projekt-M158-169-Matia-Sandro.git](https://github.com/matiasamardzic/Projekt-M158-169-Matia-Sandro.git)
+git clone https://github.com/matiasamardzic/Projekt-M158-169-Matia-Sandro.git
 cd Projekt-M158-169-Matia-Sandro
 ```
 
