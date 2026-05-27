@@ -60,7 +60,7 @@ sudo chmod -R 777 moodledata
 Sie können nun parallel auf beide Systeme zugreifen, um die erfolgreiche Side-by-Side-Migration zu überprüfen:
 
 * **Neues System (Ziel-Zustand):** `http://localhost`
-  *(Login: vmadmin / Riethuesli>12345)*
+  
 * **Altes System (Backup-Zustand):** `http://localhost:8080`
 
 ---
